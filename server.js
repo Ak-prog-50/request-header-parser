@@ -19,7 +19,7 @@ app.get("/", function (req, res) {
 });
 
 
-
+//whoami
 app.get('/whoami',(req,res) => {
   const ipaddress = req.headers['x-forwarded-for'] || req.ip
   const language = req.headers['accept-language']
