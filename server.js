@@ -2,32 +2,49 @@
 // where your node app starts
 
 // init project
-require('dotenv').config();
-var express = require('express');
-var app = express();
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
-var cors = require('cors');
+const cors = require('cors');
 app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+app.get('/api', (req,res) => {
+  res.send({
+    unix : Date.now(),
+    utc : new Date().toUTCString()
+  })
+})
 
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
-});
 
+app.get('/api/:date',(req,res) => {
+  const input = parseInt(req.params.date);
+  const response = {}
+  const unix = Math.round(Date.parse(req.params.date))
+  if(isNaN(input)) {
+    res.send({ error : "Invalid Date" })
+    return
+  }
+  else if (unix) {
+    response.unix = unix
+    response.utc = new Date(unix).toUTCString()
+  }
+  else {
+    response.unix = input
+    response.utc = new Date(input).toUTCString()
+  }
+  res.send(response)
+})
 
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
-});
+app.listen(port, _ => console.log(`App is listening on port ${port}`))
